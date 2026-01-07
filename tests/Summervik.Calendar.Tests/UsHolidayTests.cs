@@ -107,7 +107,7 @@ public class UsHolidayTests
     [Fact]
     public void Juneteenth_2027_CelebratedJune18()
     {
-        DateOnly exp = new DateOnly(2027, 6, 18);
+        DateOnly exp = new(2027, 6, 18);
         Assert.Equal(exp, UsHolidays.Juneteenth(2027).GetValueOrDefault().CelebratedOn());
     }
 
@@ -123,7 +123,7 @@ public class UsHolidayTests
     [Fact]
     public void IndependenceDay_2027_CelebratedJuly5()
     {
-        DateOnly exp = new DateOnly(2027, 7, 5);
+        DateOnly exp = new(2027, 7, 5);
         Assert.Equal(exp, UsHolidays.IndependenceDay(2027).GetValueOrDefault().CelebratedOn());
     }
 
@@ -192,7 +192,7 @@ public class UsHolidayTests
     [Fact]
     public void ChristmasDay_2027_CelebratedDec24()
     {
-        DateOnly exp = new DateOnly(2027, 12, 24);
+        DateOnly exp = new(2027, 12, 24);
         Assert.Equal(exp, UsHolidays.ChristmasDay(2027).GetValueOrDefault().CelebratedOn());
     }
 

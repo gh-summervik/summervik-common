@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Summervik.Calendar;
 
 public static class DateUtilities
