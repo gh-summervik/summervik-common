@@ -1,4 +1,6 @@
-namespace Summervik.Transformations.Tests;
+using Summervik.Common.Transformations;
+
+namespace Summervik.Common.Tests;
 
 public class UnitedStatesPhoneFormatterTests
 {

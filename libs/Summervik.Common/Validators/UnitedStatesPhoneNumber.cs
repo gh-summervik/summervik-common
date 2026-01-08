@@ -1,4 +1,4 @@
-namespace Summervik.Validators;
+namespace Summervik.Common.Validators;
 
 /// <summary>
 /// Utility for validating the structure of United States phone numbers.

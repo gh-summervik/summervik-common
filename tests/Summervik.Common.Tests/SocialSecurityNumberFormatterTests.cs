@@ -1,6 +1,6 @@
-using Xunit;
+using Summervik.Common.Transformations;
 
-namespace Summervik.Transformations.Tests;
+namespace Summervik.Common.Tests;
 
 public class SocialSecurityNumberFormatterTests
 {

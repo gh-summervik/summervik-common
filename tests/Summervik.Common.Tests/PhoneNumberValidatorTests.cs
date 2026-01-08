@@ -1,6 +1,8 @@
-namespace Summervik.Validators.Tests;
+using Summervik.Common.Validators;
 
-public class PhoneNumberTests
+namespace Summervik.Common.Tests;
+
+public class PhoneNumberValidatorTests
 {
     [Theory]
     [InlineData("123", false)]

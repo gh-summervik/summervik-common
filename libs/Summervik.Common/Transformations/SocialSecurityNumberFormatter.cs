@@ -1,6 +1,4 @@
-using System;
-
-namespace Summervik.Transformations;
+namespace Summervik.Common.Transformations;
 
 /// <summary>
 /// Provides formatting for U.S. Social Security Numbers.

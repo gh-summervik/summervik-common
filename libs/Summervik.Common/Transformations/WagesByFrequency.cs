@@ -1,4 +1,4 @@
-namespace Summervik.Transformations;
+namespace Summervik.Common.Transformations;
 
 /// <summary>
 /// Utility class for converting dollar amounts between pay frequencies.

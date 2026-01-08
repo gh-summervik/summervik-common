@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace Summervik.Calendar;
+namespace Summervik.Common.Calendar;
 
 /// <summary>
 /// Represents the calendar of U.S. holidays.

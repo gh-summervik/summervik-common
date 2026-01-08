@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Summervik.Validators;
+namespace Summervik.Common.Validators;
 
 /// <summary>
 /// Utility for validating United States Social Security Numbers.

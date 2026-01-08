@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Summervik.Transformations;
+namespace Summervik.Common.Transformations;
 
 /// <summary>
 /// Utility for common cryptography needs (hashing and authenticated AES encryption).

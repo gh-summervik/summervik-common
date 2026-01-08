@@ -1,6 +1,8 @@
-namespace Summervik.Validators.Tests;
+using Summervik.Common.Validators;
 
-public class SocialSecurityNumberTests
+namespace Summervik.Common.Tests;
+
+public class SocialSecurityNumberValidatorTests
 {
     [Theory]
     [InlineData("123-12-1233")]

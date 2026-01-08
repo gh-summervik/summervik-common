@@ -1,8 +1,7 @@
-using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Summervik.Transformations;
+namespace Summervik.Common.Transformations;
 
 /// <summary>
 /// Utility class for converting numbers to English text.

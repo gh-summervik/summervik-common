@@ -1,7 +1,8 @@
-﻿using System.Security.Cryptography;
+﻿using Summervik.Common.Transformations;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace Summervik.Transformations.Tests;
+namespace Summervik.Common.Tests;
 
 public class CryptographyTests
 {

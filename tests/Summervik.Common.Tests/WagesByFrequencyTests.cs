@@ -1,6 +1,7 @@
-﻿using static Summervik.Transformations.WagesByFrequency;
+﻿using Summervik.Common.Transformations;
+using static Summervik.Common.Transformations.WagesByFrequency;
 
-namespace Summervik.Transformations.Tests;
+namespace Summervik.Common.Tests;
 
 public class WagesByFrequencyTests
 {

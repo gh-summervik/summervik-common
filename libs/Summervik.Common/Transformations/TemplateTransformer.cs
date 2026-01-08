@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-[assembly:InternalsVisibleTo("Summervik.Transformations.Tests")]
-namespace Summervik.Transformations;
+[assembly: InternalsVisibleTo("Summervik.Common.Tests")]
+namespace Summervik.Common.Transformations;
 
-public static partial class TemplateTransformation
+public static partial class TemplateTransformer
 {
     internal static readonly Regex _dataTagRegex = DataTagRegex();
     internal static readonly Regex _curlyBraceRegex = CurlyBraceRegex();

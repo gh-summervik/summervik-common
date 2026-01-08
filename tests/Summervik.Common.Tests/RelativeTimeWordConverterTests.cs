@@ -1,6 +1,8 @@
-namespace Summervik.Transformations.Tests;
+using Summervik.Common.Transformations;
 
-public class RelativeTimeWordConvertTests
+namespace Summervik.Common.Tests;
+
+public class RelativeTimeWordConverterTests
 {
     [Theory]
     [InlineData("5 seconds ago", 5, "seconds")]

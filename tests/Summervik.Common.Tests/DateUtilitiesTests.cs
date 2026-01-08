@@ -1,6 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using Summervik.Common.Calendar;
+using Summervik.Common.Extensions;
+using System.Collections.Immutable;
 
-namespace Summervik.Calendar.Tests;
+namespace Summervik.Common.Tests;
 
 public class DateUtilitiesTests
 {

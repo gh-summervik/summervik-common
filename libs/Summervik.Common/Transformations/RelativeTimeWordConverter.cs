@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Summervik.Transformations;
+namespace Summervik.Common.Transformations;
 
 public static partial class RelativeTimeWordConverter
 {
