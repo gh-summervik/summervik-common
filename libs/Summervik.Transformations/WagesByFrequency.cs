@@ -38,7 +38,7 @@ public static class WagesByFrequency
         public static double WeeksInYearPrecise => DaysInYearPrecise / 7D;
     }
 
-    private static double GetAnnualMultiplier(PayFrequency frequency, bool usePrecision, double workHoursInDay, double workHoursInWeek)
+    private static double GetAnnualMultiplier(PayFrequency frequency, bool usePrecision, double workHoursInDay)
     {
         double weeksPerYear = usePrecision ? CalendarFactors.WeeksInYearPrecise : CalendarFactors.WeeksInYear;
 
@@ -63,27 +63,27 @@ public static class WagesByFrequency
     /// Convert a wage dollar amount from one frequency to another.
     /// </summary>
     public static decimal ConvertWages(PayFrequency sourceFrequency, PayFrequency targetFrequency, decimal amount,
-        double workHoursInDay = 8D, double workHoursInWeek = 40D, bool usePrecision = false)
+        double workHoursInDay = 8D, bool usePrecision = false)
     {
         if (amount == 0 || sourceFrequency == targetFrequency)
             return amount;
 
-        double multSource = GetAnnualMultiplier(sourceFrequency, usePrecision, workHoursInDay, workHoursInWeek);
-        double multTarget = GetAnnualMultiplier(targetFrequency, usePrecision, workHoursInDay, workHoursInWeek);
+        double multSource = GetAnnualMultiplier(sourceFrequency, usePrecision, workHoursInDay);
+        double multTarget = GetAnnualMultiplier(targetFrequency, usePrecision, workHoursInDay);
 
         decimal factor = (decimal)(multSource / multTarget);
         return amount * factor;
     }
 
     public static decimal ConvertWages(string sourceFrequency, string targetFrequency, decimal amount,
-        double workHoursInDay = 8D, double workHoursInWeek = 40D, bool usePrecision = false)
+        double workHoursInDay = 8D, bool usePrecision = false)
     {
         if (!TryParseFrequency(sourceFrequency, out PayFrequency src))
             throw new ArgumentException($"Unknown source frequency: {sourceFrequency}");
         if (!TryParseFrequency(targetFrequency, out PayFrequency tgt))
             throw new ArgumentException($"Unknown target frequency: {targetFrequency}");
 
-        return ConvertWages(src, tgt, amount, workHoursInDay, workHoursInWeek, usePrecision);
+        return ConvertWages(src, tgt, amount, workHoursInDay, usePrecision);
     }
 
     private static bool TryParseFrequency(string input, out PayFrequency frequency)

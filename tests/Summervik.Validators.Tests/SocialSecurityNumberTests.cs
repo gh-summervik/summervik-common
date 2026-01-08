@@ -2,10 +2,6 @@ namespace Summervik.Validators.Tests;
 
 public class SocialSecurityNumberTests
 {
-    public SocialSecurityNumberTests()
-    {
-    }
-
     [Theory]
     [InlineData("123-12-1233")]
     [InlineData("123121233")]
@@ -45,12 +41,14 @@ public class SocialSecurityNumberTests
     }
 
     [Theory]
-    [InlineData("001-01-0001")]
+    [InlineData("001-01-0001")] // Low area, non-zero group/serial
     [InlineData("236-01-0001")]
     [InlineData("247-01-0001")]
     [InlineData("586-01-0001")]
     [InlineData("700-01-0001")]
     [InlineData("749-01-0001")]
+    [InlineData("123-45-6789")] // Standard valid
+    [InlineData("889-12-3456")] // High but valid post-randomization
     public void Ssn_Valid(string ssn)
     {
         Assert.True(SocialSecurityNumber.IsValid(ssn));
@@ -61,31 +59,11 @@ public class SocialSecurityNumberTests
     [InlineData("000-11-1111")]
     [InlineData("111-00-1111")]
     [InlineData("111-11-0000")]
-    [InlineData("237-11-1111")]
-    [InlineData("246-11-1111")]
-    [InlineData("587-11-1111")]
-    [InlineData("679-11-1111")]
-    [InlineData("681-11-1111")]
-    [InlineData("690-11-1111")]
-    [InlineData("699-11-1111")]
-    [InlineData("750-11-1111")]
+    [InlineData("666-11-1111")]
+    [InlineData("900-11-1111")]
     [InlineData("999-11-1111")]
     public void Ssn_Invalid(string ssn)
     {
         Assert.False(SocialSecurityNumber.IsValid(ssn));
-    }
-
-    [Fact]
-    public void Used_UnusedAreas()
-    {
-        var unusedAreas = SocialSecurityNumber.UnusedAreas;
-        var usedAreas = SocialSecurityNumber.UsedAreas;
-
-        Assert.Empty(usedAreas.Intersect(unusedAreas));
-
-        var allAreas = unusedAreas.Union(usedAreas);
-
-        foreach (int area in Enumerable.Range(1, 999))
-            Assert.Contains(area, allAreas);
     }
 }
