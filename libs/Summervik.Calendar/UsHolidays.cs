@@ -9,6 +9,9 @@ namespace Summervik.Calendar;
 /// </summary>
 public static class UsHolidays
 {
+    /// <summary>
+    /// A collection of holidays supported by this class.
+    /// </summary>
     public static class Names
     {
         public const string NewYears = "New Year's Day";
@@ -28,6 +31,9 @@ public static class UsHolidays
         public const string Christmas = "Christmas Day";
         public const string NewYearsEve = "New Year's Eve Day";
 
+        /// <summary>
+        /// Get the names of all holidays supported by this class.
+        /// </summary>
         public static IEnumerable<string> GetAll()
         {
             return typeof(Names)
@@ -151,7 +157,6 @@ public static class UsHolidays
         var day = Enumerable.Range(1, 30).Where(d =>
             new DateOnly(year, 10, d).DayOfWeek is DayOfWeek.Monday).ElementAt(1);
         return new DateOnly(year, 10, day);
-
     }
 
     [Description(Names.VeteransDay)]

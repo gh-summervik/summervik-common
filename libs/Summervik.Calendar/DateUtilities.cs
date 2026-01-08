@@ -2,6 +2,9 @@ namespace Summervik.Calendar;
 
 public static class DateUtilities
 {
+    /// <summary>
+    /// Get all dates between the two dates, inclusively.
+    /// </summary>
     public static IEnumerable<DateOnly> GetInclusiveDays(DateOnly date1, DateOnly date2)
     {
         if (date2 < date1)
@@ -39,5 +42,8 @@ public static class DateUtilities
                 ? date.AddDays(1)
                 : date;
 
+    /// <summary>
+    /// Extension to move Saturday to Friday and Sunday to Monday when appropriate.
+    /// </summary>
     public static DateOnly CelebratedOn(this DateOnly date) => AdjustWeekendDayToNearestWeekday(date);
 }

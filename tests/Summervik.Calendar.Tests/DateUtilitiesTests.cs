@@ -71,4 +71,16 @@ public class DateUtilitiesTests
         var mon = DateUtilities.AdjustWeekendDayToNearestWeekday(sun);
         Assert.True(mon.DayOfWeek is DayOfWeek.Monday);
     }
+
+    [Fact]
+    public void GetWeekDays_CountsAllWeekdays()
+    {
+        var christmas = UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2025);
+        Assert.True(christmas.HasValue);
+        var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
+        Assert.True(newYears.HasValue);
+        var actual = DateUtilities.GetWeekDays(christmas.Value, newYears.Value).ToImmutableArray();
+        int expected = 6;
+        Assert.Equal(expected, actual.Length);
+    }
 }

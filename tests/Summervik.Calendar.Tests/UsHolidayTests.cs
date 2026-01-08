@@ -254,4 +254,58 @@ public class UsHolidayTests
         Assert.Equal(cd, UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2026).GetValueOrDefault());
         Assert.Equal(nye, UsHolidays.GetHolidayByName(UsHolidays.Names.NewYearsEve, 2026).GetValueOrDefault());
     }
+
+    [Theory]
+    [InlineData("2026-12-25", true)]
+    [InlineData("2026-12-26", false)]
+    public void GetNameForHoliday_NotNullWhenFound(string date, bool isHoliday)
+    {
+        Assert.True(DateOnly.TryParse(date, out var dt));
+        if (isHoliday)
+            Assert.NotNull(UsHolidays.GetNameForHoliday(dt));
+        else
+            Assert.Null(UsHolidays.GetNameForHoliday(dt));
+    }
+
+    [Fact]
+    public void GetWeekDaysExcludingHolidays_GetsDates()
+    {
+        var christmas = UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2025);
+        Assert.True(christmas.HasValue);
+        var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
+        Assert.True(newYears.HasValue);
+        var actual = UsHolidays.GetWeekDaysExcludingHolidays(christmas.Value, newYears.Value).ToImmutableArray();
+        int expected = 3; // Christmas, New Year's Eve, and New Years all excluded.
+        Assert.Equal(expected, actual.Length);
+        Assert.DoesNotContain(christmas.GetValueOrDefault(), actual);
+        Assert.DoesNotContain(newYears.GetValueOrDefault().AddDays(-1), actual);
+        Assert.DoesNotContain(newYears.GetValueOrDefault(), actual);
+    }
+
+    [Fact]
+    public void CountWeekDaysExcludingHolidays_CountsInclusive()
+    {
+        var christmas = UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2025);
+        Assert.True(christmas.HasValue);
+        var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
+        Assert.True(newYears.HasValue);
+        var actual = UsHolidays.CountWeekDaysExcludingHolidays(christmas.Value, newYears.Value);
+        int expected = 3; // Christmas, New Year's Eve, and New Years all excluded.
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void GetInclusiveHolidaysBetweenDates_FindsHolidays()
+    {
+        var christmas = UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2025);
+        Assert.True(christmas.HasValue);
+        var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
+        Assert.True(newYears.HasValue);
+        var actual = UsHolidays.GetInclusiveHolidaysBetweenDates(christmas.Value, newYears.Value).ToImmutableArray();
+        int expected = 3; // Christmas, New Year's Eve, and New Years all included.
+        Assert.Equal(expected, actual.Length);
+        Assert.Contains(christmas.GetValueOrDefault(), actual);
+        Assert.Contains(newYears.GetValueOrDefault().AddDays(-1), actual);
+        Assert.Contains(newYears.GetValueOrDefault(), actual);
+    }
 }
