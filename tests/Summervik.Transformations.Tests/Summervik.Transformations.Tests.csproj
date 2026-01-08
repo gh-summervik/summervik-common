@@ -19,6 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\libs\Summervik.Calendar\Summervik.Calendar.csproj" />
 		<ProjectReference Include="..\..\libs\Summervik.Transformations\Summervik.Transformations.csproj" />
 	</ItemGroup>
 
