@@ -199,7 +199,7 @@ public class UsHolidayTests
     [Fact]
     public void GetHoldaysForYear_2026()
     {
-        var holidays = UsHolidays.GetHoldaysForYear(2026);
+        var holidays = UsHolidays.GetHolidaysForYear(2026);
 
         var nyd = new DateOnly(2026, 1, 1);
         var mlk = new DateOnly(2026, 1, 19);

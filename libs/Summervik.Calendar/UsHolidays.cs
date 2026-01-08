@@ -192,7 +192,7 @@ public static class UsHolidays
 
     public static string? GetNameForHoliday(DateOnly date)
     {
-        var holidaysForYear = GetHoldaysForYear(date.Year);
+        var holidaysForYear = GetHolidaysForYear(date.Year);
 
         var item = holidaysForYear.FirstOrDefault(h => h.Value.Equals(date));
 
@@ -200,10 +200,10 @@ public static class UsHolidays
     }
 
     public static IEnumerable<DateOnly> GetWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) =>
-        DateUtilities.GetWeekDays(start, finish).Except(
+        DateUtilities.GetWeekdays(start, finish).Except(
             GetInclusiveHolidaysBetweenDates(start, finish).Where(h =>
-                DateUtilities.AdjustWeekendDayToNearestWeekday(h).DayOfWeek != DayOfWeek.Saturday
-                && DateUtilities.AdjustWeekendDayToNearestWeekday(h).DayOfWeek != DayOfWeek.Sunday));
+                DateUtilities.AdjustToObservedWeekday(h).DayOfWeek != DayOfWeek.Saturday
+                && DateUtilities.AdjustToObservedWeekday(h).DayOfWeek != DayOfWeek.Sunday));
 
     public static int CountWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) => GetWeekDaysExcludingHolidays(start, finish).Count();
 
@@ -213,7 +213,7 @@ public static class UsHolidays
             (start, finish) = (finish, start);
 
         foreach (int year in Enumerable.Range(start.Year, (finish.Year - start.Year) + 1))
-            foreach (var holiday in GetHoldaysForYear(year).Values.Where(k => k.HasValue && k >= start && k <= finish))
+            foreach (var holiday in GetHolidaysForYear(year).Values.Where(k => k.HasValue && k >= start && k <= finish))
                 yield return holiday!.Value;
     }
 
@@ -233,7 +233,7 @@ public static class UsHolidays
         return method is null ? null : (DateOnly?)method.Method.Invoke(null, [year])!;
     }
 
-    public static IReadOnlyDictionary<string, DateOnly?> GetHoldaysForYear(int year) =>
+    public static IReadOnlyDictionary<string, DateOnly?> GetHolidaysForYear(int year) =>
             typeof(UsHolidays)
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .Select(m => new

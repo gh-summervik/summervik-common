@@ -50,7 +50,7 @@ public class DateUtilitiesTests
     {
         var d1 = new DateOnly(2026, 1, 1);
         var d2 = d1.AddDays(6);
-        var count = DateUtilities.CountWeekDays(d1, d2);
+        var count = DateUtilities.CountWeekdays(d1, d2);
         Assert.Equal(5, count);
     }
 
@@ -59,7 +59,7 @@ public class DateUtilitiesTests
     {
         var sat = new DateOnly(2026, 1, 3);
         Assert.True(sat.DayOfWeek is DayOfWeek.Saturday);
-        var fri = DateUtilities.AdjustWeekendDayToNearestWeekday(sat);
+        var fri = DateUtilities.AdjustToObservedWeekday(sat);
         Assert.True(fri.DayOfWeek is DayOfWeek.Friday);
     }
 
@@ -68,7 +68,7 @@ public class DateUtilitiesTests
     {
         var sun = new DateOnly(2026, 1, 4);
         Assert.True(sun.DayOfWeek is DayOfWeek.Sunday);
-        var mon = DateUtilities.AdjustWeekendDayToNearestWeekday(sun);
+        var mon = DateUtilities.AdjustToObservedWeekday(sun);
         Assert.True(mon.DayOfWeek is DayOfWeek.Monday);
     }
 
@@ -79,7 +79,7 @@ public class DateUtilitiesTests
         Assert.True(christmas.HasValue);
         var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
         Assert.True(newYears.HasValue);
-        var actual = DateUtilities.GetWeekDays(christmas.Value, newYears.Value).ToImmutableArray();
+        var actual = DateUtilities.GetWeekdays(christmas.Value, newYears.Value).ToImmutableArray();
         int expected = 6;
         Assert.Equal(expected, actual.Length);
     }
