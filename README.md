@@ -1,10 +1,22 @@
 # Summervik.Common
-
 A collection of practical, business-oriented C# utilities and extensions for common tasks in applications like payroll, government forms, templating, and data formatting.
 
 This library focuses on reliability, simplicity, and real-world usability. All classes are thoroughly unit-tested — check out the test project for detailed usage examples.
 
-The current version uses .NET 10, but most of the code will work in lower versions.
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
+[![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
+
+## Installation
+Available as a NuGet package:
+
+[![NuGet Version](https://img.shields.io/nuget/v/Summervik.Common.svg?style=flat)](https://www.nuget.org/packages/Summervik.Common/)[![NuGet Downloads](https://img.shields.io/nuget/dt/Summervik.Common.svg?style=flat)](https://www.nuget.org/packages/Summervik.Common/)
+
+```bash
+dotnet add package Summervik.Common
+```
 
 ## Features
 
@@ -94,6 +106,3 @@ string result = TemplateTransformation.TransformCurlyBraces("Hello {Name}!", dat
 
 ## Contributing
 Pull requests welcome! Focus on new utilities, performance improvements, or bug fixes.
-
-## License
-MIT License.
