@@ -4,19 +4,19 @@ namespace Summervik.Common.Tests;
 
 public class TemplateTransformerTests
 {
-    private readonly Dictionary<string, string> _basicData = new(StringComparer.OrdinalIgnoreCase)
+    private class TestData
     {
-        { "Name", "Alice" },
-        { "Age", "30" },
-        { "City", "Wonderland" }
-    };
+        public string Name { get; } = "Alice";
+        public int Age { get; } = 30;
+        public string City { get; } = "Wonderland";
+    }
 
     [Theory]
     [InlineData("{Name} is {Age} years old.", "Alice is 30 years old.")]
     [InlineData("Hello { name }!", "Hello Alice!")] // Case insensitivity
     public void TransformCurlyBraces_BasicReplacement(string template, string expected)
     {
-        string result = TemplateTransformer.TransformCurlyBraces(template, _basicData);
+        string result = TemplateTransformer.TransformCurlyBraces(template, new TestData());
         Assert.Equal(expected, result);
     }
 
@@ -25,7 +25,7 @@ public class TemplateTransformerTests
     {
         string template = "{Missing}";
         Assert.Throws<KeyNotFoundException>(() =>
-            TemplateTransformer.TransformCurlyBraces(template, _basicData));
+            TemplateTransformer.TransformCurlyBraces(template, new { Name = "Bob" }));
     }
 
     [Theory]
@@ -33,7 +33,12 @@ public class TemplateTransformerTests
     [InlineData("<data name=\"name\" />", "Alice")] // Case insensitivity
     public void TransformDataTags_BasicReplacement(string template, string expected)
     {
-        string result = TemplateTransformer.TransformDataTags(template, _basicData);
+        string result = TemplateTransformer.TransformDataTags(template, new
+        {
+            Name = "Alice",
+            Age = 30,
+            City = "Wonderland"
+        });
         Assert.Equal(expected, result);
     }
 
@@ -42,7 +47,7 @@ public class TemplateTransformerTests
     [InlineData("[City]", "Wonderland")]
     public void TransformBrackets_Basic(string template, string expected)
     {
-        string result = TemplateTransformer.TransformBrackets(template, _basicData);
+        string result = TemplateTransformer.TransformBrackets(template, new TestData());
         Assert.Equal(expected, result);
     }
 
@@ -51,19 +56,18 @@ public class TemplateTransformerTests
     [InlineData("#City#", "Wonderland")]
     public void TransformPounds_Basic(string template, string expected)
     {
-        string result = TemplateTransformer.TransformPoundsSigns(template, _basicData);
+        string result = TemplateTransformer.TransformPoundsSigns(template, new TestData());
         Assert.Equal(expected, result);
     }
 
     [Fact]
     public void Transform_MissingKey_ReplacesWithEmpty_WhenConfigured()
     {
-        var data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Name", "Bob" } };
         string template = "{Name} {Missing} {Age}";
 
         string result = TemplateTransformer.Transform(
             template: template,
-            keyValuePairs: data,
+            model: new { Name = "Bob" },
             regex: TemplateTransformer._curlyBraceRegex,
             throwOnMissingKeys: false,
             replaceMissingWithEmpty: true);
@@ -74,12 +78,11 @@ public class TemplateTransformerTests
     [Fact]
     public void Transform_MissingKey_LeavesPlaceholder_WhenConfigured()
     {
-        var data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Name", "Bob" } };
         string template = "{Name} {Missing}";
 
         string result = TemplateTransformer.Transform(
             template: template,
-            keyValuePairs: data,
+            model: new { Name = "Bob" },
             regex: TemplateTransformer._curlyBraceRegex,
             throwOnMissingKeys: false,
             replaceMissingWithEmpty: false);
@@ -90,14 +93,12 @@ public class TemplateTransformerTests
     [Fact]
     public void Transform_Recursive_NestedPlaceholders()
     {
-        var data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "First", "Alice" },
-            { "Full", "{First} Johnson" }
-        };
-
         string template = "Hello {Full}!";
-        string result = TemplateTransformer.TransformCurlyBraces(template, data, recursive: true);
+        string result = TemplateTransformer.TransformCurlyBraces(template, new
+        {
+            First = "Alice",
+            Full = "{First} Johnson"
+        }, recursive: true);
 
         Assert.Equal("Hello Alice Johnson!", result);
     }
@@ -105,16 +106,14 @@ public class TemplateTransformerTests
     [Fact]
     public void Transform_Recursive_MaxIterations_PreventsInfiniteLoop()
     {
-        var data = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "A", "{B}" },
-            { "B", "{A}" }
-        };
-
         string template = "{A}";
 
         Assert.Throws<InvalidOperationException>(() =>
-            TemplateTransformer.TransformCurlyBraces(template, data, recursive: true, maxIterations: 10));
+            TemplateTransformer.TransformCurlyBraces(template, new
+            {
+                A = "{B}",
+                B = "{A}"
+            }, recursive: true, maxIterations: 10));
     }
 
     [Theory]
@@ -123,7 +122,7 @@ public class TemplateTransformerTests
     [InlineData("   ", "   ")]
     public void Transform_EmptyOrNullTemplate_ReturnsAsIs(string? template, string expected)
     {
-        string result = TemplateTransformer.TransformCurlyBraces(template ?? string.Empty, _basicData);
+        string result = TemplateTransformer.TransformCurlyBraces(template ?? string.Empty, new TestData());
         Assert.Equal(expected, result);
     }
 
@@ -133,7 +132,7 @@ public class TemplateTransformerTests
         Assert.Throws<InvalidOperationException>(() =>
             TemplateTransformer.Transform(
                 template: "{Name}",
-                keyValuePairs: _basicData,
+                model: new TestData(),
                 regex: TemplateTransformer._curlyBraceRegex,
                 keyGroupIndex: 99));
     }
@@ -144,7 +143,7 @@ public class TemplateTransformerTests
         string template = "{Name} is {Age} and lives in {City} ({Name} again).";
         string expected = "Alice is 30 and lives in Wonderland (Alice again).";
 
-        string result = TemplateTransformer.TransformCurlyBraces(template, _basicData);
+        string result = TemplateTransformer.TransformCurlyBraces(template, new TestData());
         Assert.Equal(expected, result);
     }
 }
