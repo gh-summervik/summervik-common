@@ -8,11 +8,11 @@
 		<LangVersion>latest</LangVersion>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<PackageId>Summervik.Common</PackageId>
-		<Version>0.2.0</Version>
+		<Version>0.3.0</Version>
 		<Authors>Summervik</Authors>
 		<Description>A collection of practical business-oriented C# utilities for calendar, transformations, validators, and more.</Description>
 		<PackageTags>csharp;utilities;calendar;holidays;template;phone;ssn;wages</PackageTags>
-		<RepositoryUrl>https://github.comgh-summervik/Summervik.Common</RepositoryUrl>
+		<RepositoryUrl>https://github.com/gh-summervik/summervik-common</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/gh-summervik/Summervik.Common</PackageProjectUrl>

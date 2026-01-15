@@ -34,35 +34,51 @@ public static class UsHolidays
         /// <summary>
         /// Get the names of all holidays supported by this class.
         /// </summary>
-        public static IEnumerable<string> GetAll()
-        {
-            return typeof(Names)
+        public static IEnumerable<string> GetAll() => typeof(Names)
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
                 .Select(f => (string)f.GetRawConstantValue()!);
-        }
-    }
 
+        /*
+         * I excluded Inauguration Day here because it is seldom observed by businesses.
+         */
+        public static IEnumerable<string> GetFederalHolidays() => GetAll()
+            .Where(k => k is NewYears or MartinLutherKingJr or PresidentsDay or
+                MemorialDay or IndependenceDay or LaborDay or ColumbusDay or VeteransDay or
+                Thanksgiving or Christmas);
+    }
 
     [Description(Names.NewYears)]
-    public static DateOnly? NewYearsDay(int year) => new(year, 1, 1);
+    public static DateOnly? NewYearsDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : new(year, 1, 1);
+
+    [Description(Names.NewYears)]
+    public static Holiday? NewYearsDay(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : new Holiday(Names.NewYears, new DateOnly(year, 1, 1), true);
 
     [Description(Names.MartinLutherKingJr)]
-    public static DateOnly? MartinLutherKingJrBirthday(int year)
+    public static DateOnly? MartinLutherKingJrBirthdayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : year < 1986 ? null : FindNthDayOfMonth(year, 1, DayOfWeek.Monday, 3);
+
+    [Description(Names.MartinLutherKingJr)]
+    public static Holiday? MartinLutherKingJrBirthday(int year)
     {
-        if (year < 1986)
-            return null;
-
-        var day = Enumerable.Range(1, 28)
-            .Where(d => new DateOnly(year, 1, d).DayOfWeek is DayOfWeek.Monday)
-            .ElementAt(2);
-
-        return new DateOnly(year, 1, day);
+        var dt = MartinLutherKingJrBirthdayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Name = Names.MartinLutherKingJr,
+            Date = dt.Value
+        };
     }
 
+
     [Description(Names.InaugurationDay)]
-    public static DateOnly? InaugurationDay(int year)
+    public static DateOnly? InaugurationDayDate(int year)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
         if (year % 4 != 1)
             return null;
 
@@ -80,47 +96,88 @@ public static class UsHolidays
             : dt.Value.DayOfWeek is DayOfWeek.Sunday ? dt.Value.AddDays(1) : dt;
     }
 
-    [Description(Names.PresidentsDay)]
-    public static DateOnly? PresidentsDay(int year)
+    [Description(Names.InaugurationDay)]
+    public static Holiday? InaugurationDay(int year)
     {
-        if (year < 1885)
-            return null;
-
-        var day = Enumerable.Range(1, 28)
-            .Where(d => new DateOnly(year, 2, d).DayOfWeek is DayOfWeek.Monday)
-            .ElementAt(2);
-        return new DateOnly(year, 2, day);
+        var dt = InaugurationDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Name = Names.InaugurationDay,
+            Date = dt.Value
+        };
     }
+
+    [Description(Names.PresidentsDay)]
+    public static Holiday? PresidentsDay(int year)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
+
+        var dt = PresidentsDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Name = Names.PresidentsDay,
+            Date = dt.Value
+        };
+    }
+
+    [Description(Names.PresidentsDay)]
+    public static DateOnly? PresidentsDayDate(int year) => year < 1885 ? null :
+        FindNthDayOfMonth(year, 2, DayOfWeek.Monday, 3);
 
     /*
      * The true origin of this holiday in the U.S. is fuzzy.
      */
     [Description(Names.Valentines)]
-    public static DateOnly? ValentinesDay(int year) => new(year, 2, 14);
+    public static DateOnly? ValentinesDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : new(year, 2, 14);
+
+    [Description(Names.Valentines)]
+    public static Holiday? ValentinesDay(int year) => new Holiday(
+        Name: Names.Valentines,
+        Date: new(year, 2, 14)
+    );
 
     [Description(Names.Easter)]
-    public static DateOnly? EasterSunday(int year)
+    public static DateOnly? EasterSundayDate(int year)
     {
-        var g = year % 19;
-        var c = year / 100;
-        var h = (c - c / 4 - (8 * c + 13) / 25 + 19 * g + 15) % 30;
-        var i = h - h / 28 * (1 - h / 28 * (29 / (h + 1)) * ((21 - g) / 11));
-        var day = i - (year + year / 4 + i + 2 - c + c / 4) % 7 + 28;
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
 
-        var month = 3;
-
-        if (day > 31)
-        {
-            month++;
-            day -= 31;
-        }
+        int a = year % 19;
+        int b = year / 100;
+        int c = year % 100;
+        int d = b / 4;
+        int e = b % 4;
+        int f = (b + 8) / 25;
+        int g = (b - f + 1) / 3;
+        int h = (19 * a + b - d - g + 15) % 30;
+        int i = c / 4;
+        int k = c % 4;
+        int l = (32 + 2 * e + 2 * i - h - k) % 7;
+        int m = (a + 11 * h + 22 * l) / 451;
+        int month = (h + l - 7 * m + 114) / 31; // 3 = March, 4 = April
+        int day = ((h + l - 7 * m + 114) % 31) + 1;
 
         return new DateOnly(year, month, day);
     }
 
-    [Description(Names.MemorialDay)]
-    public static DateOnly? MemorialDay(int year)
+    [Description(Names.Easter)]
+    public static Holiday? EasterSunday(int year)
     {
+        var dt = EasterSundayDate(year);
+        return !dt.HasValue ? null
+            : new Holiday()
+            {
+                Name = Names.Easter,
+                Date = dt.Value
+            };
+    }
+
+    [Description(Names.MemorialDay)]
+    public static DateOnly? MemorialDayDate(int year)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
+
         if (year < 1868)
             return null;
 
@@ -132,15 +189,54 @@ public static class UsHolidays
         return memorialDay;
     }
 
+    [Description(Names.MemorialDay)]
+    public static Holiday? MemorialDay(int year)
+    {
+        var dt = MemorialDayDate(year);
+        return !dt.HasValue ? null
+            : new Holiday()
+            {
+                Date = dt.Value,
+                Name = Names.MemorialDay
+            };
+    }
+
     [Description(Names.Juneteenth)]
-    public static DateOnly? Juneteenth(int year) => year < 2021 ? null : new(year, 6, 19);
+    public static DateOnly? JuneteenthDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 2021 ? null : new(year, 6, 19);
+
+    [Description(Names.Juneteenth)]
+    public static Holiday? Juneteenth(int year)
+    {
+        var dt = JuneteenthDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.Juneteenth,
+            ObservesWeekendAdjustment = true
+        };
+    }
 
     [Description(Names.IndependenceDay)]
-    public static DateOnly? IndependenceDay(int year) => year < 1870 ? null : new(year, 7, 4);
+    public static DateOnly? IndependenceDayDate(int year) => year < 1 ?
+        throw new ArgumentOutOfRangeException(nameof(year)) : year < 1870 ? null : new(year, 7, 4);
+
+    [Description(Names.IndependenceDay)]
+    public static Holiday? IndependenceDay(int year)
+    {
+        var dt = IndependenceDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.IndependenceDay,
+            ObservesWeekendAdjustment = true
+        };
+    }
 
     [Description(Names.LaborDay)]
-    public static DateOnly? LaborDay(int year)
+    public static DateOnly? LaborDayDate(int year)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
         if (year < 1887)
             return null;
         var laborDay = new DateOnly(year, 9, 1);
@@ -149,75 +245,159 @@ public static class UsHolidays
         return laborDay;
     }
 
-    [Description(Names.ColumbusDay)]
-    public static DateOnly? ColumbusDay(int year)
+    [Description(Names.LaborDay)]
+    public static Holiday? LaborDay(int year)
     {
-        if (year < 1937)
-            return null;
-        var day = Enumerable.Range(1, 30).Where(d =>
-            new DateOnly(year, 10, d).DayOfWeek is DayOfWeek.Monday).ElementAt(1);
-        return new DateOnly(year, 10, day);
+        var dt = LaborDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.LaborDay
+        };
+    }
+
+    [Description(Names.ColumbusDay)]
+    public static DateOnly? ColumbusDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1937 ? null :
+        FindNthDayOfMonth(year, 10, DayOfWeek.Monday, 2);
+
+    [Description(Names.ColumbusDay)]
+    public static Holiday? ColumbusDay(int year)
+    {
+        var dt = ColumbusDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.ColumbusDay
+        };
     }
 
     [Description(Names.VeteransDay)]
-    public static DateOnly? VeteransDay(int year) => year < 1938 ? null : new(year, 11, 11);
+    public static DateOnly? VeteransDayDate(int year) => year < 1 ?
+        throw new ArgumentOutOfRangeException(nameof(year)) : year < 1938 ? null : new(year, 11, 11);
+
+    [Description(Names.VeteransDay)]
+    public static Holiday? VeteransDay(int year)
+    {
+        var dt = VeteransDayDate(year);
+        return !dt.HasValue ? null :
+            new Holiday()
+            {
+                Date = dt.Value,
+                Name = Names.VeteransDay,
+                ObservesWeekendAdjustment = true
+            };
+    }
 
     /*
-     * The origin of Thanksgiving is sometimes attributed to Lincoln (and with reason),
+     * The origin of Thanksgiving is sometimes attributed to Lincoln (with reason),
      * but FDR and Congress made it a thing in 1941.
      */
     [Description(Names.Thanksgiving)]
-    public static DateOnly? ThanksgivingDay(int year)
-    {
-        if (year < 1941)
-            return null;
-        var day = Enumerable.Range(1, 28)
-            .Where(d => new DateOnly(year, 11, d).DayOfWeek is DayOfWeek.Thursday)
-            .ElementAt(3);
+    public static DateOnly? ThanksgivingDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1941 ? null :
+        FindNthDayOfMonth(year, 11, DayOfWeek.Thursday, 4);
 
-        return new DateOnly(year, 11, day);
+    [Description(Names.Thanksgiving)]
+    public static Holiday? ThanksgivingDay(int year)
+    {
+        var dt = ThanksgivingDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.Thanksgiving
+        };
     }
 
     [Description(Names.ChristmasEve)]
-    public static DateOnly? ChristmasEveDay(int year) => year < 1870 ? null :
-        ChristmasDay(year)?.AddDays(-1);
+    public static DateOnly? ChristmasEveDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1870 ? null : ChristmasDayDate(year)?.AddDays(-1);
+
+    [Description(Names.ChristmasEve)]
+    public static Holiday? ChristmasEveDay(int year)
+    {
+        var dt = ChristmasEveDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.ChristmasEve
+        };
+    }
 
     [Description(Names.Christmas)]
-    public static DateOnly? ChristmasDay(int year) => year < 1870 ? null :
-        new(year, 12, 25);
+    public static DateOnly? ChristmasDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1870 ? null : new(year, 12, 25);
+
+    [Description(Names.Christmas)]
+    public static Holiday? ChristmasDay(int year)
+    {
+        var dt = ChristmasDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.Christmas,
+            ObservesWeekendAdjustment = true
+        };
+    }
 
     [Description(Names.NewYearsEve)]
-    public static DateOnly? NewYearsEveDay(int year) => year < 1870 ? null :
-        new(year, 12, 31);
+    public static DateOnly? NewYearsEveDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1870 ? null : new(year, 12, 31);
+
+    [Description(Names.NewYearsEve)]
+    public static Holiday? NewYearsEveDay(int year)
+    {
+        var dt = NewYearsEveDayDate(year);
+        return !dt.HasValue ? null : new Holiday()
+        {
+            Date = dt.Value,
+            Name = Names.NewYearsEve
+        };
+    }
 
     public static string? GetNameForHoliday(DateOnly date)
     {
         var holidaysForYear = GetHolidaysForYear(date.Year);
 
-        var item = holidaysForYear.FirstOrDefault(h => h.Value.Equals(date));
+        var item = holidaysForYear.FirstOrDefault(h => h.HasValue && h.Value.Date.Equals(date));
 
-        return item.Equals(default) ? null : item.Key;
+        return item.Equals(default) ? null : item.Value.Name;
     }
 
+    public static DateOnly GetObservedDate(DateOnly date) => date.DayOfWeek switch
+    {
+        DayOfWeek.Saturday => date.AddDays(-1),
+        DayOfWeek.Sunday => date.AddDays(1),
+        _ => date
+    };
+
     public static IEnumerable<DateOnly> GetWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) =>
-        DateUtilities.GetWeekdays(start, finish).Except(
-            GetInclusiveHolidaysBetweenDates(start, finish).Where(h =>
-                DateUtilities.AdjustToObservedWeekday(h).DayOfWeek != DayOfWeek.Saturday
-                && DateUtilities.AdjustToObservedWeekday(h).DayOfWeek != DayOfWeek.Sunday));
+        DateUtilities.GetWeekdays(start, finish).Except(GetInclusiveHolidayDatesBetweenDates(start, finish).Where(h =>
+            h.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday));
 
     public static int CountWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) => GetWeekDaysExcludingHolidays(start, finish).Count();
 
-    public static IEnumerable<DateOnly> GetInclusiveHolidaysBetweenDates(DateOnly start, DateOnly finish)
+    public static IEnumerable<DateOnly> GetInclusiveHolidayDatesBetweenDates(DateOnly start, DateOnly finish)
     {
         if (finish < start)
             (start, finish) = (finish, start);
 
         foreach (int year in Enumerable.Range(start.Year, (finish.Year - start.Year) + 1))
-            foreach (var holiday in GetHolidaysForYear(year).Values.Where(k => k.HasValue && k >= start && k <= finish))
+            foreach (var holiday in GetHolidaysForYear(year).Where(k => k.HasValue && k.Value.ObservedDate >= start && k.Value.ObservedDate <= finish))
+                yield return holiday!.Value.Date;
+    }
+
+    public static IEnumerable<Holiday> GetInclusiveHolidaysBetweenDates(DateOnly start, DateOnly end)
+    {
+        if (end < start)
+            (start, end) = (end, start);
+
+        foreach (int year in Enumerable.Range(start.Year, (end.Year - start.Year) + 1))
+            foreach (var holiday in GetHolidaysForYear(year).Where(k => k.HasValue && k.Value.ObservedDate >= start && k.Value.ObservedDate <= end))
                 yield return holiday!.Value;
     }
 
-    public static DateOnly? GetHolidayByName(string name, int year)
+    public static DateOnly? GetHolidayDateByName(string name, int year)
     {
         var method = typeof(UsHolidays)
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
@@ -228,25 +408,72 @@ public static class UsHolidays
             })
             .FirstOrDefault(x =>
                 x.Description is not null &&
+                x.Method.ReturnType == typeof(DateOnly?) &&
                 string.Equals(x.Description, name, StringComparison.OrdinalIgnoreCase));
 
         return method is null ? null : (DateOnly?)method.Method.Invoke(null, [year])!;
     }
 
-    public static IReadOnlyDictionary<string, DateOnly?> GetHolidaysForYear(int year) =>
-            typeof(UsHolidays)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+    public static Holiday? GetHolidayByName(string name, int year)
+    {
+        var method = typeof(UsHolidays)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Select(m => new
+            {
+                Method = m,
+                m.GetCustomAttribute<DescriptionAttribute>()?.Description
+            })
+            .FirstOrDefault(x =>
+                x.Description is not null &&
+                x.Method.ReturnType == typeof(Holiday?) &&
+                string.Equals(x.Description, name, StringComparison.OrdinalIgnoreCase));
+
+        return method is null ? null : (Holiday?)method.Method.Invoke(null, [year])!;
+    }
+
+    public static IEnumerable<Holiday?> GetHolidaysForYear(int year) =>
+            typeof(UsHolidays).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .Select(m => new
                 {
                     Method = m,
                     m.GetCustomAttribute<DescriptionAttribute>()?.Description
                 })
                 .Where(x => x.Description != null
-                            && x.Method.ReturnType == typeof(DateOnly?)
+                            && x.Method.ReturnType == typeof(Holiday?)
                             && x.Method.GetParameters().Length == 1
                             && x.Method.GetParameters()[0].ParameterType == typeof(int))
-                .ToDictionary(
-                    x => x.Description!,
-                    x => (DateOnly?)x.Method.Invoke(null, [year])!
-                );
+                .Select(k => (Holiday?)k.Method.Invoke(null, [year]))
+                .Where(k => k is not null);
+
+    public static DateOnly? FindNthDayOfMonth(int year, int month, DayOfWeek dayOfWeek, int position)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(month, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(month, 12);
+        ArgumentOutOfRangeException.ThrowIfLessThan(position, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(position, 5);
+
+        try
+        {
+            int lastDayOfMonth;
+            if (DateTime.IsLeapYear(year) && month == 2)
+                lastDayOfMonth = 29;
+            else if (month == 2)
+                lastDayOfMonth = 28;
+            else if (month is 4 or 6 or 9 or 11)
+                lastDayOfMonth = 30;
+            else
+                lastDayOfMonth = 31;
+
+            var day = Enumerable.Range(1, lastDayOfMonth)
+                .Where(d => new DateOnly(year, month, d).DayOfWeek == dayOfWeek)
+                .ElementAt(position - 1);
+
+            return new DateOnly(year, month, day);
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

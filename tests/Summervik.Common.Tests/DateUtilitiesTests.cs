@@ -77,9 +77,9 @@ public class DateUtilitiesTests
     [Fact]
     public void GetWeekDays_CountsAllWeekdays()
     {
-        var christmas = UsHolidays.GetHolidayByName(UsHolidays.Names.Christmas, 2025);
+        var christmas = UsHolidays.GetHolidayDateByName(UsHolidays.Names.Christmas, 2025);
         Assert.True(christmas.HasValue);
-        var newYears = UsHolidays.GetHolidayByName(UsHolidays.Names.NewYears, 2026);
+        var newYears = UsHolidays.GetHolidayDateByName(UsHolidays.Names.NewYears, 2026);
         Assert.True(newYears.HasValue);
         var actual = DateUtilities.GetWeekdays(christmas.Value, newYears.Value).ToImmutableArray();
         int expected = 6;

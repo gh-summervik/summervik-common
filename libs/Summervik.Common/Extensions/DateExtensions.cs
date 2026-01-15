@@ -3,7 +3,7 @@
 public static class DateExtensions
 {
     /// <summary>
-    /// Extension method: Gets the date a holiday would be celebrated on (adjusted for weekends).
+    /// Gets the date a holiday would be celebrated on (adjusted for weekends).
     /// </summary>
     public static DateOnly CelebratedOn(this DateOnly date) => Calendar.DateUtilities.AdjustToObservedWeekday(date);
 

@@ -26,11 +26,18 @@ dotnet add package Summervik.Common
     - Adjust weekend dates to nearest weekday (Saturday Friday, Sunday Monday)—standard for holiday observation.
 
 - **`UsHolidays`**:
-  - Calculates U.S. federal and common cultural holidays for any year.
+  - Calculates U.S. Federal and common cultural holidays for any year.
   - Returns `null` for years before official recognition (e.g., Juneteenth before 2021).
   - Always-available holidays include New Year's Day, Valentine's Day, and Easter Sunday.
   - Helpers for discovering holidays in date ranges and excluding holidays from weekday counts (business days).
 
+- **`AnnualHolidayCalendar`**:
+  - Create annual calendar with custom start date (to support fiscal years).
+  - Methods to add Federal holidays or all US Holidays.
+  - Add/Remove custom holidays with optional weekend adjustment.
+  - Query for holidays by name or date.
+  - Read-only, sorted list of holidays.
+  
 ### Extensions
 Useful extension methods for `DateOnly` and `DateTime` (e.g., range enumeration, holiday checks—see source for details).
 
@@ -44,8 +51,8 @@ Useful extension methods for `DateOnly` and `DateTime` (e.g., range enumeration,
   - Examples: "123" becomes "one hundred twenty-three", "1.23" bcomes "one point two three" and "0.0000" becomes "zero."
 
 - **`WordsToTime`**:
-  - Bidirectional natural-language t me conversion.
-  - Parse "3 days ago" or "in 2 hours" to a `DateTime.""
+  - Bidirectional natural-language time conversion.
+  - Parse "3 days ago" or "in 2 hours" to a `DateTime`.
   - Convert `DateTime` to "3 days ago" or "in 2 hours."
 
 - **`SocialSecurityNumberFormatter`**:
@@ -102,6 +109,13 @@ DateTime parsed = WordsToTime.ParseWords("2 hours from now");
 var data = new Dictionary<string, string> { { "Name", "Alice" } };
 string result = TemplateTransformation.TransformCurlyBraces("Hello {Name}!", data);
 // "Hello Alice!"
+
+// AnnualHolidayCalendar
+var calendar = new AnnualHolidayCalendar(2026)
+    .WithFederalUsHolidays()
+    .WithHoliday(new DateOnly(2026, 12, 26), "Company Day Off");
+
+bool isHoliday = calendar.IsHoliday(new DateOnly(2026, 7, 3)); // True for observed Independence Day
 ```
 
 ## Contributing
