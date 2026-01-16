@@ -1,6 +1,6 @@
 ﻿using Summervik.Common.Calendar;
 
-namespace Summervik.Common.Tests;
+namespace Summervik.Common.Tests.Calendar;
 
 public class AnnualHolidayCalendarTests
 {

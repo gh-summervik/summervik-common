@@ -1,6 +1,6 @@
 using Summervik.Common.Validators;
 
-namespace Summervik.Common.Tests;
+namespace Summervik.Common.Tests.Validators;
 
 public class SocialSecurityNumberValidatorTests
 {

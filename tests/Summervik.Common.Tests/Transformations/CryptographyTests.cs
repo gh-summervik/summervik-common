@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Summervik.Common.Tests;
+namespace Summervik.Common.Tests.Transformations;
 
 public class CryptographyTests
 {

@@ -68,7 +68,7 @@ public static class DateUtilities
     /// Adjusts a weekend date to the observed weekday (Saturday to previous Friday, Sunday to next Monday).
     /// Weekdays are unchanged. This follows common holiday observation rules.
     /// </summary>
-    public static DateOnly AdjustToObservedWeekday(DateOnly date) =>
+    public static DateOnly MoveToNearestWeekday(DateOnly date) =>
         date.DayOfWeek switch
         {
             DayOfWeek.Saturday => date.AddDays(-1),

@@ -39,7 +39,10 @@ dotnet add package Summervik.Common
   - Read-only, sorted list of holidays.
   
 ### Extensions
-Useful extension methods for `DateOnly` and `DateTime` (e.g., range enumeration, holiday checks—see source for details).
+- **`DateOnlyExtensions`** and **`DateTimeExtensions`**:
+  - Useful extension methods for start and end of day and adding/counting weekdays.
+- **`StreamExtensions`**:
+  - Utilities for writing strings directly to a string and reading streams directly into strings.
 
 ### Transformations
 - **`Cryptography`**:
