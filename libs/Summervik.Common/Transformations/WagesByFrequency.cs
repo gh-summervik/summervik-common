@@ -75,6 +75,9 @@ public static class WagesByFrequency
         return amount * factor;
     }
 
+    /// <summary>
+    /// Convert a wage dollar amount from one frequency to another.
+    /// </summary>
     public static decimal ConvertWages(string sourceFrequency, string targetFrequency, decimal amount,
         double workHoursInDay = 8D, bool usePrecision = false)
     {

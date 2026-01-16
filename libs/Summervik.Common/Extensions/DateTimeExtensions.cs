@@ -16,7 +16,8 @@ public static class DateTimeExtensions
         DateOnly.FromDateTime(dateTime).ToDateTime(TimeOnly.MaxValue, dateTime.Kind);
 
     /// <summary>
-    /// Add or subtract weekdays from the specified date.
+    /// Add a specified number of weedays to a date.
+    /// The <paramref name="numberToIncrement"/> can be either positive or negative.
     /// </summary>
     public static DateTime AddWeekdays(this DateTime dateTime, int numberToIncrement)
     {
@@ -46,7 +47,7 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
-    /// An convenience function to check if a day is a weekday.
+    /// A convenience method to check if a day is a weekday.
     /// </summary>
     public static bool IsWeekday(this DateTime date) =>
         date.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday;

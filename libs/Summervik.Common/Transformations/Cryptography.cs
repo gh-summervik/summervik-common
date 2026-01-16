@@ -8,7 +8,10 @@ namespace Summervik.Common.Transformations;
 /// </summary>
 public static class Cryptography
 {
-    // Hashing
+    /// <summary>
+    /// Gets the hash value of the <paramref name="input"/> using
+    /// the provided <paramref name="hashAlgorithm"/> specified.
+    /// </summary>
     public static string GetHash(HashAlgorithm hashAlgorithm, string input)
     {
         ArgumentNullException.ThrowIfNull(hashAlgorithm);
@@ -21,9 +24,17 @@ public static class Cryptography
         return Convert.ToHexString(data).ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Verify the <paramref name="hash"/> of the <paramref name="input"/>
+    /// using the <paramref name="hashAlgorithm"/> specified.
+    /// </summary>
     public static bool VerifyHash(HashAlgorithm hashAlgorithm, string input, string hash) =>
         StringComparer.OrdinalIgnoreCase.Equals(GetHash(hashAlgorithm, input), hash);
 
+    /// <summary>
+    /// Get a hash value for the <paramref name="fileInfo"/> provided using the
+    /// <paramref name="hashAlgorithm"/> specified.
+    /// </summary>
     public static string GetHashForFile(HashAlgorithm hashAlgorithm, FileInfo fileInfo)
     {
         ArgumentNullException.ThrowIfNull(hashAlgorithm);
@@ -34,17 +45,27 @@ public static class Cryptography
         return Convert.ToHexString(data).ToLowerInvariant();
     }
 
+    /// <summary>
+    /// Verify the <paramref name="hash"/> for the <paramref name="fileInfo"/> provided
+    /// using the <paramref name="hashAlgorithm"/> specified.
+    /// </summary>
     public static bool VerifyHashForFile(HashAlgorithm hashAlgorithm, FileInfo fileInfo, string hash) =>
         StringComparer.OrdinalIgnoreCase.Equals(GetHashForFile(hashAlgorithm, fileInfo), hash);
 
     // Secure AES-GCM encryption (authenticated, handles arbitrary bytes)
     private const int SaltSize = 16;
-    private const int NonceSize = 12; // Recommended
-    private const int TagSize = 16;   // Recommended
+    private const int NonceSize = 12; 
+    private const int TagSize = 16;
 
+    /// <summary>
+    /// Create a symmetric block cipher for the <paramref name="original"/> byte array
+    /// and the <paramref name="passkey"/> provided.
+    /// </summary>
+    /// <remarks>AES = Advanced Encryption Standard</remarks>
+    /// <seealso href="https://www.geeksforgeeks.org/computer-networks/advanced-encryption-standard-aes/"/>
     public static byte[] EncryptAes(byte[] original, string passkey)
     {
-        ArgumentNullException.ThrowIfNullOrEmpty(passkey);
+        ArgumentException.ThrowIfNullOrEmpty(passkey);
         ArgumentNullException.ThrowIfNull(original);
 
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
@@ -66,27 +87,9 @@ public static class Cryptography
         return result;
     }
 
-    public static byte[] EncryptAes(byte[] original, byte[] key)
-    {
-        ArgumentNullException.ThrowIfNull(original);
-
-        if (key is null || (key.Length != 16 && key.Length != 24 && key.Length != 32))
-            throw new ArgumentException("Key must be 16, 24, or 32 bytes.");
-
-        using var aes = new AesGcm(key, TagSize);
-        byte[] nonce = RandomNumberGenerator.GetBytes(NonceSize);
-        byte[] tag = new byte[TagSize];
-        byte[] ciphertext = new byte[original.Length];
-
-        aes.Encrypt(nonce, original, ciphertext, tag);
-
-        byte[] result = new byte[NonceSize + TagSize + ciphertext.Length];
-        Buffer.BlockCopy(nonce, 0, result, 0, NonceSize);
-        Buffer.BlockCopy(tag, 0, result, NonceSize, TagSize);
-        Buffer.BlockCopy(ciphertext, 0, result, NonceSize + TagSize, ciphertext.Length);
-        return result;
-    }
-
+    /// <summary>
+    /// Decrypt a <paramref name="cipher"/> using the <paramref name="passkey"/> provided.
+    /// </summary>
     public static byte[] DecryptAes(byte[] cipher, string passkey)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(passkey);
@@ -114,6 +117,36 @@ public static class Cryptography
         return plaintext;
     }
 
+    /// <summary>
+    /// Encrypt the <paramref name="original"/> byte array using the
+    /// <paramref name="key"/> provided.
+    /// </summary>
+    /// <remarks>The key must have a length of 16, 24, or 32 bytes.</remarks>
+    public static byte[] EncryptAes(byte[] original, byte[] key)
+    {
+        ArgumentNullException.ThrowIfNull(original);
+
+        if (key is null || (key.Length != 16 && key.Length != 24 && key.Length != 32))
+            throw new ArgumentException("Key must be 16, 24, or 32 bytes.");
+
+        using var aes = new AesGcm(key, TagSize);
+        byte[] nonce = RandomNumberGenerator.GetBytes(NonceSize);
+        byte[] tag = new byte[TagSize];
+        byte[] ciphertext = new byte[original.Length];
+
+        aes.Encrypt(nonce, original, ciphertext, tag);
+
+        byte[] result = new byte[NonceSize + TagSize + ciphertext.Length];
+        Buffer.BlockCopy(nonce, 0, result, 0, NonceSize);
+        Buffer.BlockCopy(tag, 0, result, NonceSize, TagSize);
+        Buffer.BlockCopy(ciphertext, 0, result, NonceSize + TagSize, ciphertext.Length);
+        return result;
+    }
+
+    /// <summary>
+    /// Decrypt a <paramref name="cipher"/> using the <paramref name="key"/> provided.
+    /// </summary>
+    /// <remarks>The key must have a length of 16, 24, or 32 bytes.</remarks>
     public static byte[] DecryptAes(byte[] cipher, byte[] key)
     {
         ArgumentNullException.ThrowIfNull(cipher);

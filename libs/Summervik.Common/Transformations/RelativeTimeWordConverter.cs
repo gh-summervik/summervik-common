@@ -7,7 +7,7 @@ public static partial class RelativeTimeWordConverter
     private static readonly Regex _timeRefRegex = TimeRegex();
 
     /// <summary>
-    /// Convert text to DateTime.
+    /// Convert relative text to DateTime.
     /// </summary>
     public static DateTime ParseWords(string timeRef, DateTime? relativePosition = null)
     {
@@ -45,7 +45,7 @@ public static partial class RelativeTimeWordConverter
     }
 
     /// <summary>
-    /// Convert DateTime to text.
+    /// Convert DateTime to relative text.
     /// </summary>
     public static string ToWords(DateTime target, DateTime? baseTime = null)
     {

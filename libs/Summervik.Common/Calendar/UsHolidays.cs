@@ -39,9 +39,13 @@ public static class UsHolidays
                 .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
                 .Select(f => (string)f.GetRawConstantValue()!);
 
-        /*
-         * I excluded Inauguration Day here because it is seldom observed by businesses.
-         */
+        /// <summary>
+        /// Gets all US Federal holidays supported by this class.
+        /// </summary>
+        /// <remarks>
+        /// I excluded Inauguration Day here because it is seldom observed by businesses.
+        /// </remarks>
+        /// <returns></returns>
         public static IEnumerable<string> GetFederalHolidays() => GetAll()
             .Where(k => k is NewYears or MartinLutherKingJr or PresidentsDay or
                 MemorialDay or IndependenceDay or LaborDay or ColumbusDay or VeteransDay or
@@ -74,7 +78,6 @@ public static class UsHolidays
         };
     }
 
-
     [Description(Names.InaugurationDay)]
     public static DateOnly? InaugurationDayDate(int year)
     {
@@ -92,6 +95,11 @@ public static class UsHolidays
         else
             dt = null;
 
+        /*
+         * This one doesn't use the normal observation rules.
+         * It only moves to Monday when it occurs on a Sunday.
+         * Saturdays are okay.
+         */
         return dt is null ? null
             : dt.Value.DayOfWeek is DayOfWeek.Sunday ? dt.Value.AddDays(1) : dt;
     }
@@ -108,6 +116,11 @@ public static class UsHolidays
     }
 
     [Description(Names.PresidentsDay)]
+    public static DateOnly? PresidentsDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : year < 1885 ? null : FindNthDayOfMonth(year, 2, DayOfWeek.Monday, 3);
+
+    [Description(Names.PresidentsDay)]
     public static Holiday? PresidentsDay(int year)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);
@@ -119,10 +132,6 @@ public static class UsHolidays
             Date = dt.Value
         };
     }
-
-    [Description(Names.PresidentsDay)]
-    public static DateOnly? PresidentsDayDate(int year) => year < 1885 ? null :
-        FindNthDayOfMonth(year, 2, DayOfWeek.Monday, 3);
 
     /*
      * The true origin of this holiday in the U.S. is fuzzy.
@@ -218,8 +227,9 @@ public static class UsHolidays
     }
 
     [Description(Names.IndependenceDay)]
-    public static DateOnly? IndependenceDayDate(int year) => year < 1 ?
-        throw new ArgumentOutOfRangeException(nameof(year)) : year < 1870 ? null : new(year, 7, 4);
+    public static DateOnly? IndependenceDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : year < 1870 ? null : new(year, 7, 4);
 
     [Description(Names.IndependenceDay)]
     public static Holiday? IndependenceDay(int year)
@@ -258,8 +268,8 @@ public static class UsHolidays
 
     [Description(Names.ColumbusDay)]
     public static DateOnly? ColumbusDayDate(int year) => year < 1
-        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1937 ? null :
-        FindNthDayOfMonth(year, 10, DayOfWeek.Monday, 2);
+        ? throw new ArgumentOutOfRangeException(nameof(year))
+        : year < 1937 ? null : FindNthDayOfMonth(year, 10, DayOfWeek.Monday, 2);
 
     [Description(Names.ColumbusDay)]
     public static Holiday? ColumbusDay(int year)
@@ -273,8 +283,8 @@ public static class UsHolidays
     }
 
     [Description(Names.VeteransDay)]
-    public static DateOnly? VeteransDayDate(int year) => year < 1 ?
-        throw new ArgumentOutOfRangeException(nameof(year)) : year < 1938 ? null : new(year, 11, 11);
+    public static DateOnly? VeteransDayDate(int year) => year < 1
+        ? throw new ArgumentOutOfRangeException(nameof(year)) : year < 1938 ? null : new(year, 11, 11);
 
     [Description(Names.VeteransDay)]
     public static Holiday? VeteransDay(int year)
@@ -364,16 +374,12 @@ public static class UsHolidays
         return item.Equals(default) ? null : item.Value.Name;
     }
 
-    public static DateOnly GetObservedDate(DateOnly date) => date.DayOfWeek switch
-    {
-        DayOfWeek.Saturday => date.AddDays(-1),
-        DayOfWeek.Sunday => date.AddDays(1),
-        _ => date
-    };
+    public static DateOnly GetObservedDate(DateOnly date) => DateUtilities.MoveToNearestWeekday(date);
 
     public static IEnumerable<DateOnly> GetWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) =>
-        DateUtilities.GetWeekdays(start, finish).Except(GetInclusiveHolidayDatesBetweenDates(start, finish).Where(h =>
-            h.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday));
+        DateUtilities.GetWeekdays(start, finish)
+            .Except(GetInclusiveHolidayDatesBetweenDates(start, finish)
+            .Where(h => h.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday));
 
     public static int CountWeekDaysExcludingHolidays(DateOnly start, DateOnly finish) => GetWeekDaysExcludingHolidays(start, finish).Count();
 
@@ -443,8 +449,12 @@ public static class UsHolidays
                             && x.Method.GetParameters().Length == 1
                             && x.Method.GetParameters()[0].ParameterType == typeof(int))
                 .Select(k => (Holiday?)k.Method.Invoke(null, [year]))
-                .Where(k => k is not null);
+                .Where(k => k is not null)
+                .OrderBy(k => k.GetValueOrDefault().Date);
 
+    /// <summary>
+    /// Finds the Nth position of a day (identified by the day of week) in a month.
+    /// </summary>
     public static DateOnly? FindNthDayOfMonth(int year, int month, DayOfWeek dayOfWeek, int position)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(year, 1);

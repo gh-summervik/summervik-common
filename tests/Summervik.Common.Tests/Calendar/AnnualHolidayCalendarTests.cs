@@ -186,21 +186,21 @@ public class AnnualHolidayCalendarTests
         Assert.Equal(15, holidays.Count); // All except Inauguration Day
 
         // Check a fixed date with adjustment
-        var independence = holidays.FirstOrDefault(h => h.Value.Name == UsHolidays.Names.IndependenceDay);
+        var independence = holidays.FirstOrDefault(h => h.GetValueOrDefault().Name == UsHolidays.Names.IndependenceDay);
         Assert.NotNull(independence);
         Assert.Equal(new DateOnly(2026, 7, 4), independence.Value.Date); // Nominal Sat
         Assert.Equal(new DateOnly(2026, 7, 3), independence.Value.ObservedDate); // Adjusted to Fri
         Assert.True(independence.Value.ObservesWeekendAdjustment);
 
         // Check a nth-weekday (no adjustment)
-        var mlk = holidays.FirstOrDefault(h => h.Value.Name == UsHolidays.Names.MartinLutherKingJr);
+        var mlk = holidays.FirstOrDefault(h => h.GetValueOrDefault().Name == UsHolidays.Names.MartinLutherKingJr);
         Assert.NotNull(mlk);
         Assert.Equal(new DateOnly(2026, 1, 19), mlk.Value.Date);
         Assert.Equal(new DateOnly(2026, 1, 19), mlk.Value.ObservedDate);
         Assert.False(mlk.Value.ObservesWeekendAdjustment); // Assume false in code
 
         // Check cultural (no adjustment)
-        var valentines = holidays.FirstOrDefault(h => h.Value.Name == UsHolidays.Names.Valentines);
+        var valentines = holidays.FirstOrDefault(h => h.GetValueOrDefault().Name == UsHolidays.Names.Valentines);
         Assert.NotNull(valentines);
         Assert.Equal(new DateOnly(2026, 2, 14), valentines.Value.Date);
         Assert.Equal(new DateOnly(2026, 2, 14), valentines.Value.ObservedDate);

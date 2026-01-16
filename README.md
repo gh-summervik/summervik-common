@@ -1,11 +1,10 @@
 # Summervik.Common
 A collection of practical, business-oriented C# utilities and extensions for common tasks in applications like payroll, government forms, templating, and data formatting.
 
-This library focuses on reliability, simplicity, and real-world usability. All classes are thoroughly unit-tested — check out the test project for detailed usage examples.
+This library focuses on reliability, simplicity, and real-world usability. All classes are thoroughly tested - check out the test project for additional usage examples.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![.NET](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/download)
 
@@ -22,14 +21,14 @@ dotnet add package Summervik.Common
 
 ### Calendar
 - **`DateUtilities`**:
-  - Count inclusive days or weekdays (Monday–Friday) between dates.
-    - Adjust weekend dates to nearest weekday (Saturday Friday, Sunday Monday)—standard for holiday observation.
+  - Count inclusive days or weekdays (Monday-Friday) between dates.
+    - Adjust weekend dates to nearest weekday (Saturday -> Friday, Sunday -> Monday) - standard for holiday observation.
 
 - **`UsHolidays`**:
   - Calculates U.S. Federal and common cultural holidays for any year.
   - Returns `null` for years before official recognition (e.g., Juneteenth before 2021).
   - Always-available holidays include New Year's Day, Valentine's Day, and Easter Sunday.
-  - Helpers for discovering holidays in date ranges and excluding holidays from weekday counts (business days).
+  - Helpers for discovering holidays in date ranges and excluding holidays from weekday counts.
 
 - **`AnnualHolidayCalendar`**:
   - Create annual calendar with custom start date (to support fiscal years).
@@ -42,12 +41,17 @@ dotnet add package Summervik.Common
 - **`DateOnlyExtensions`** and **`DateTimeExtensions`**:
   - Useful extension methods for start and end of day and adding/counting weekdays.
 - **`StreamExtensions`**:
-  - Utilities for writing strings directly to a string and reading streams directly into strings.
+  - Utilities for writing strings directly to a stream and reading from streams directly into a string.
+- **`EnumExtensions`**:
+  - Get the string value of an Enum value using the `[Description]` attribute as its primary source and the string representation of the enum value as the fallback.
+  Very useful when you want to put a string representation of the an Enum value into a database record.
+- **`StringExtensions`**:
+  - Converts a string value to an Enum value. This is the inversion of what the `EnumExtensions` class does.
 
 ### Transformations
 - **`Cryptography`**:
   - Secure hashing (SHA256 etc.) for strings and files.
-  - Authenticated AES-GCM encryption/decryption (modern and secure).
+  - Authenticated AES-GCM encryption/decryption.
 
 - **`NumbersToWords`**:
   - Converts integers (up to vigintillion), negatives, and decimals to English words.
@@ -55,8 +59,8 @@ dotnet add package Summervik.Common
 
 - **`WordsToTime`**:
   - Bidirectional natural-language time conversion.
-  - Parse "3 days ago" or "in 2 hours" to a `DateTime`.
-  - Convert `DateTime` to "3 days ago" or "in 2 hours."
+  - Parse "3 days ago" or "in 2 hours" to a `DateTime` representation.
+  - Convert `DateTime` values to phrases like "3 days ago" or "in 2 hours."
 
 - **`SocialSecurityNumberFormatter`**:
   - Custom formatter for SSNs: "F" (dashes, default), "N" (digits only).
@@ -77,7 +81,7 @@ dotnet add package Summervik.Common
     - "dots": 123.456.7890
     - "I": +1 (123) 456-7890 (requires exactly 10 digits)
     - "Idots": +1.123.456.7890
-  - Handles extensions (≤4 digits), local (7 digits), and standard (10 digits).
+  - Handles extensions (<=4 digits), local (7 digits), and standard (10 digits).
 
 - **`WagesByFrequency`**:
   - Converts wage amounts between pay frequencies (hourly, daily, weekly, biweekly, semi-monthly, monthly, etc.).
@@ -91,6 +95,8 @@ dotnet add package Summervik.Common
   - Format + plausible issue validation (rejects zeros and reserved areas per current SSA rules).
 
 ## Usage Examples
+
+*see the test project for more comprehensive usage examples.*
 
 ```csharp
 // SSN Formatting

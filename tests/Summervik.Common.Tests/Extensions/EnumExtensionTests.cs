@@ -37,6 +37,15 @@ public class EnumExtensionTests
         Blue = 1 << 2
     }
 
+    [Flags]
+    public enum ColorFlagsNoDescription
+    {
+        None = 0,
+        Red = 1 << 0,
+        Green = 1 << 1,
+        Blue = 1 << 2
+    }
+
     [Fact]
     public void GetEnumDescription_WithDescription()
     {
@@ -62,5 +71,12 @@ public class EnumExtensionTests
     {
         var color = ColorFlags.Blue | ColorFlags.Green;
         Assert.Equal("Lime Green, Deep Sea", color.GetDescription());
+    }
+
+    [Fact]
+    public void GetEnumDescription_NoDescription_MultiFlag()
+    {
+        var color = ColorFlagsNoDescription.Red | ColorFlagsNoDescription.Green;
+        Assert.Equal("Red, Green", color.GetDescription());
     }
 }

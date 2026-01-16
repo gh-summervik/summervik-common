@@ -7,7 +7,7 @@ public static class StreamExtensions
     private static readonly Lock _writeLock = new();
 
     /// <summary>
-    /// Writes a message to the stream if it's writable.
+    /// Writes a string to the stream if the stream is writable.
     /// </summary>
     public static void WriteString(this Stream stream, string? message)
     {
@@ -45,7 +45,7 @@ public static class StreamExtensions
     }
 
     /// <summary>
-    /// Writes a message asynchronously to the stream if it's writable.
+    /// Writes a message asynchronously to the stream if the stream is writable.
     /// </summary>
     public static ValueTask WriteStringAsync(this Stream stream, string message,
         CancellationToken cancellationToken = default)
@@ -79,7 +79,7 @@ public static class StreamExtensions
             stream.Position = 0;
 
             var buffer = new byte[stream.Length];
-            _ = await stream.ReadAsync(buffer, 0, buffer.Length);
+            _ = await stream.ReadAsync(buffer, cancellationToken);
             var str = Encoding.UTF8.GetString(buffer);
             stream.Position = pos;
             return str;

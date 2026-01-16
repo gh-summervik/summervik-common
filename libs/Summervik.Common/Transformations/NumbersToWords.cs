@@ -32,17 +32,16 @@ public static partial class NumbersToWords
     private static readonly Regex _numberRegex = NumberRegex();
 
     /// <summary>
-    /// Convert a number string to English words (supports integers and decimals).
+    /// Convert a string of numbers to English words (supports integers and decimals).
     /// </summary>
     public static string ConvertToWords(string val)
     {
-        if (string.IsNullOrWhiteSpace(val))
-            throw new ArgumentNullException(nameof(val));
+        ArgumentException.ThrowIfNullOrWhiteSpace(val, nameof(val));
 
         val = val.Trim();
 
         if (!_numberRegex.IsMatch(val))
-            throw new ArgumentException("Value provided is not a valid number.");
+            throw new ArgumentException("Value provided is not a number.");
 
         bool isNegative = val[0] == '-';
         if (isNegative)
@@ -130,13 +129,13 @@ public static partial class NumbersToWords
             : $"{_zeroToNineteen[hundred]} hundred {remainderWords}";
     }
 
-    // Overloads for numeric types
     public static string ConvertToWords(int val) => ConvertToWords(val.ToString());
     public static string ConvertToWords(long val) => ConvertToWords(val.ToString());
     public static string ConvertToWords(uint val) => ConvertToWords(val.ToString());
     public static string ConvertToWords(ulong val) => ConvertToWords(val.ToString());
-    public static string ConvertToWords(double val) => ConvertToWords(val.ToString("G15")); // Preserve precision
+    public static string ConvertToWords(double val) => ConvertToWords(val.ToString("G15"));
     public static string ConvertToWords(decimal val) => ConvertToWords(val.ToString("G29"));
+    
     [GeneratedRegex(@"^-?\d+(\.\d+)?$", RegexOptions.Compiled)]
     private static partial Regex NumberRegex();
 }

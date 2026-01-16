@@ -5,6 +5,14 @@ namespace Summervik.Common.Extensions;
 
 public static class EnumExtensions
 {
+    /// <summary>
+    /// Gets the description of the enum value.
+    /// The description is determined by the <see cref="DescriptionAttribute"/>.
+    /// When the <see cref="DescriptionAttribute"/> is not present, the string
+    /// value of the enum value is returned.
+    /// When the enum has the <see cref="FlagsAttribute"/>, the value returned
+    /// is a comma separated list (e.g., "Red, Green").
+    /// </summary>
     public static string GetDescription<T>(this T enumerationValue) where T : struct, Enum
     {
         var type = enumerationValue.GetType();

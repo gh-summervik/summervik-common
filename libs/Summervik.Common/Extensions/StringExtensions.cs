@@ -5,6 +5,11 @@ namespace Summervik.Common.Extensions;
 
 public static class StringExtensions
 {
+    /// <summary>
+    /// Converts a string to an enum value.
+    /// The conversion uses the <see cref="DescriptionAttribute"/> value if
+    /// has been applied to the enum value.
+    /// </summary>
     public static T ToEnum<T>(this string text) where T : struct, Enum
     {
         var type = typeof(T);

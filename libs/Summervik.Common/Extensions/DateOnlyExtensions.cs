@@ -3,10 +3,14 @@
 public static class DateOnlyExtensions
 {
     /// <summary>
-    /// Gets the date a holiday would be celebrated on (adjusted for weekends).
+    /// Moves Saturday to Friday and Sunday to Monday.
     /// </summary>
     public static DateOnly MoveToNearestWeekday(this DateOnly date) => Calendar.DateUtilities.MoveToNearestWeekday(date);
 
+    /// <summary>
+    /// Adds the specified number of weekdays to the current date.
+    /// <paramref name="numberToIncrement"/> can be positive or negative.
+    /// </summary>
     public static DateOnly AddWeekdays(this DateOnly dateOnly, int numberToIncrement)
     {
         DateOnly date = dateOnly;
@@ -63,7 +67,7 @@ public static class DateOnlyExtensions
     }
 
     /// <summary>
-    /// An convenience function to check if a day is a weekday.
+    /// A convenience method to check if a day is a weekday.
     /// </summary>
     public static bool IsWeekday(this DateOnly date) =>
         date.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday;

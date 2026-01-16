@@ -119,5 +119,4 @@ public static partial class TemplateTransformer
 
         return dictionary;
     }
-
 }
